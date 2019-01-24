@@ -1,6 +1,7 @@
 package com.example.bluetooth_project;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -18,15 +19,19 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int ACTION_REQUEST_MULTIPLE_PERMISSION = 1;
+    private final static int MAX_TIME_DISCOVER_SECONDS = 300;
 
     private Button buttonTurnOn;
-    private ListView listView;
     private Button buttonDiscovery;
+    private Button buttonDiscoverable;
+    private ListView listView;
 
     private ArrayAdapter<String> arrayAdapter;
     private BluetoothAdapter bluetoothAdapter;
@@ -48,24 +53,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        // this hack is needed in Samsung J7
+        // this hack is needed on Samsung J7
         checkPermission();
 
         // xml elements
         buttonTurnOn = findViewById(R.id.buttonTurnOn);
         buttonDiscovery = findViewById(R.id.buttonDiscovery);
+        buttonDiscoverable = findViewById(R.id.buttonDiscoverable);
         listView = findViewById(R.id.list);
 
         buttonTurnOn.setOnClickListener(this);
         buttonDiscovery.setOnClickListener(this);
+        buttonDiscoverable.setOnClickListener(this);
 
         arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, new ArrayList<String>());
+                android.R.layout.simple_list_item_1, new ArrayList<>());
 
         listView.setAdapter(arrayAdapter);
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, filter);
+    }
+
+    private Timer timer = new Timer();
+    private TimerTask timerTaskDecreaseCounter = new TimerTask() {
+        int secondsLeft = MAX_TIME_DISCOVER_SECONDS;
+        @SuppressLint("SetTextI18n")
+        @Override
+        public void run() {
+            runOnUiThread(() ->
+                    buttonDiscoverable.setText(getResources().getString(R.string.discoverable) +
+                            " (" + --secondsLeft + ")"));
+            if(secondsLeft == 0) {
+                runOnUiThread(() -> {
+                    buttonDiscoverable.setText(getResources().getString(R.string.discoverable));
+                    timer.cancel();
+                    timer.purge();
+                });
+            }
+        }
+    };
+
+    private void buttonDiscoverableAction() {
+        // TODO: buttonDiscoverableAction
+        Intent discoverableIntent =
+                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, MAX_TIME_DISCOVER_SECONDS);
+        startActivity(discoverableIntent);
+        timer.scheduleAtFixedRate(timerTaskDecreaseCounter, 0,1000);
     }
 
     private void buttonDiscoveryAction() {
@@ -156,6 +191,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.buttonTurnOn:
                 buttonTurnOnAction();
+                break;
+            case R.id.buttonDiscoverable:
+                buttonDiscoverableAction();
                 break;
         }
     }
