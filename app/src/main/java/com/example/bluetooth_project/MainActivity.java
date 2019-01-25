@@ -169,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void addElementToList(String element) {
-        arrayAdapter.add(element);
+        if(arrayAdapter.getPosition(element) == -1) {
+            arrayAdapter.add(element);
+        }
     }
 
     private void askToEnableBluetooth(BluetoothAdapter bluetoothAdapter) {
