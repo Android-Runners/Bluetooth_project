@@ -11,11 +11,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.bluetooth_project.ALL.PublicStaticObject;
+import com.example.bluetooth_project.connectionStuff.AcceptRunnable;
+import com.example.bluetooth_project.connectionStuff.ConnectRunnable;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        PublicStaticObject.setBluetoothAdapter(bluetoothAdapter);
 
         // bluetooth doesn't exist I guess
         if(bluetoothAdapter == null) {
@@ -62,12 +66,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonDiscoverable = findViewById(R.id.buttonDiscoverable);
         listView = findViewById(R.id.list);
 
-
         buttonTurnOn.setOnClickListener(this);
         buttonDiscovery.setOnClickListener(this);
         buttonDiscoverable.setOnClickListener(this);
 
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
+        //TODO (Выровнять по центру)
 
         listView.setAdapter(arrayAdapter);
 
@@ -75,13 +79,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(receiver, filter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showToast("itemSelect: position = " + i + ", id = " + l);
-            }
-        });
+        listView.setOnItemClickListener((adapterView, view, i, l) -> listViewAction(i) );
 
+        runServer();
+    }
+
+    private AcceptRunnable acceptRunnable = new AcceptRunnable();
+    private Thread thread;
+
+    private void runServer() {
+        thread = new Thread(acceptRunnable);
+        thread.start();
+    }
+
+    private void stopServer() {
+        acceptRunnable.cancel();
+        thread.interrupt();
+    }
+
+    private void listViewAction(int i) {
+        new Thread(new ConnectRunnable(devices.get(i))).start();
     }
 
     private Timer timer = new Timer();
