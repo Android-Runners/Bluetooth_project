@@ -9,9 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final static int REQUEST_ENABLE_BT = 1;
     private final static int ACTION_REQUEST_MULTIPLE_PERMISSION = 1;
     private final static int MAX_TIME_DISCOVER_SECONDS = 300;
+    private static final int DISCOVERY_REQUEST = 228;
 
     private Button buttonTurnOn;
     private Button buttonDiscovery;
@@ -62,17 +61,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonDiscoverable = findViewById(R.id.buttonDiscoverable);
         listView = findViewById(R.id.list);
 
+
         buttonTurnOn.setOnClickListener(this);
         buttonDiscovery.setOnClickListener(this);
         buttonDiscoverable.setOnClickListener(this);
 
-        arrayAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, new ArrayList<>());
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
 
         listView.setAdapter(arrayAdapter);
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(receiver, filter);
+
     }
 
     private Timer timer = new Timer();
@@ -94,13 +95,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 228) {
+            if(resultCode == 300) {
+                timer.scheduleAtFixedRate(timerTaskDecreaseCounter, 0, 1000);
+            } else {
+                showToast("Разрешение не получено");
+            }
+        }
+    }
+
     private void buttonDiscoverableAction() {
-        // TODO: buttonDiscoverableAction
-        Intent discoverableIntent =
-                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, MAX_TIME_DISCOVER_SECONDS);
-        startActivity(discoverableIntent);
-        timer.scheduleAtFixedRate(timerTaskDecreaseCounter, 0,1000);
+        startActivityForResult(discoverableIntent, DISCOVERY_REQUEST);
     }
 
     private void buttonDiscoveryAction() {
@@ -139,6 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 addElementToList(device.getName() + " " + device.getAddress());
                 devices.add(device);
+            }
+            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                // TODO
             }
         }
     };
