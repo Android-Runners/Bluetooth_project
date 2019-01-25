@@ -40,6 +40,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private BluetoothAdapter bluetoothAdapter;
     private ArrayList<BluetoothDevice> devices = new ArrayList<>();
 
+    private AcceptRunnable acceptRunnable;
+    private ConnectRunnable connectRunnable;
+    private Thread threadAccept, threadConnect;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         PublicStaticObject.setBluetoothAdapter(bluetoothAdapter);
+
+        acceptRunnable = new AcceptRunnable();
 
         // bluetooth doesn't exist I guess
         if(bluetoothAdapter == null) {
@@ -84,21 +90,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         runServer();
     }
 
-    private AcceptRunnable acceptRunnable = new AcceptRunnable();
-    private Thread thread;
+
 
     private void runServer() {
-        thread = new Thread(acceptRunnable);
-        thread.start();
+        threadAccept = new Thread(acceptRunnable);
+        threadAccept.start();
     }
 
     private void stopServer() {
         acceptRunnable.cancel();
-        thread.interrupt();
+        threadAccept.interrupt();
     }
 
     private void listViewAction(int i) {
-        new Thread(new ConnectRunnable(devices.get(i))).start();
+        connectRunnable = new ConnectRunnable(devices.get(i));
+        threadConnect = new Thread(connectRunnable);
+        threadConnect.start();
     }
 
     private Timer timer = new Timer();
@@ -219,8 +226,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         unregisterReceiver(receiver);
+        acceptRunnable.cancel();
+        connectRunnable.cancel();
     }
 
     @Override

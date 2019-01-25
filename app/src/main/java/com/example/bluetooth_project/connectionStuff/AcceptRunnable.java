@@ -36,7 +36,9 @@ public class AcceptRunnable implements Runnable {
         // Keep listening until exception occurs or a socket is returned.
         while (true) {
             try {
+                Log.e("kek", "Before");
                 socket = serverSocket.accept();
+                Log.e("kek", "After");
             } catch (IOException e) {
                 Log.e("kek", "Socket's accept() method failed", e);
                 break;

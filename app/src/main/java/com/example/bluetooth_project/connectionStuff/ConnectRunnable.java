@@ -42,7 +42,9 @@ public class ConnectRunnable implements Runnable {
         try {
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
+            Log.e("lol", "Before");
             socket.connect();
+            Log.e("lol", "After");
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {
