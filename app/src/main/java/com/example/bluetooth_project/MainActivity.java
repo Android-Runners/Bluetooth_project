@@ -16,9 +16,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.bluetooth_project.ALL.PublicStaticObject;
-import com.example.bluetooth_project.connectionStuff.AcceptRunnable;
-import com.example.bluetooth_project.connectionStuff.ConnectRunnable;
+import com.example.bluetooth_project.ALL.PublicStaticObjects;
+import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
+import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -50,9 +50,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        PublicStaticObject.setBluetoothAdapter(bluetoothAdapter);
 
-        acceptRunnable = new AcceptRunnable();
+        // filling PublicStaticObjects
+        PublicStaticObjects.setBluetoothAdapter(bluetoothAdapter);
+        PublicStaticObjects.setMainActivity(this);
 
         // bluetooth doesn't exist I guess
         if(bluetoothAdapter == null) {
@@ -87,12 +88,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> listViewAction(i) );
 
-        runServer();
+        if(bluetoothAdapter.isEnabled()) {
+            runServer();
+        }
     }
 
-
-
     private void runServer() {
+        if(acceptRunnable == null) {
+            acceptRunnable = new AcceptRunnable();
+        }
         threadAccept = new Thread(acceptRunnable);
         threadAccept.start();
     }
@@ -109,32 +113,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private Timer timer = new Timer();
-    private TimerTask timerTaskDecreaseCounter = new TimerTask() {
-        int secondsLeft = MAX_TIME_DISCOVER_SECONDS;
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void run() {
-            runOnUiThread(() ->
+
+    private TimerTask newTimerTaskDecreaseCounter() {
+        return new TimerTask() {
+            int secondsLeft = MAX_TIME_DISCOVER_SECONDS;
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void run() {
+                runOnUiThread(() ->
                     buttonDiscoverable.setText(getResources().getString(R.string.discoverable) +
-                            " (" + --secondsLeft + ")"));
-            if(secondsLeft == 0) {
-                runOnUiThread(() -> {
-                    buttonDiscoverable.setText(getResources().getString(R.string.discoverable));
-                    timer.cancel();
-                    timer.purge();
-                });
+                                                " (" + --secondsLeft + ")"));
+                if(secondsLeft == 0) {
+                    runOnUiThread(() -> {
+                        buttonDiscoverable.setText(getResources().getString(R.string.discoverable));
+                        timer.cancel();
+                        timer.purge();
+                    });
+                }
             }
-        }
-    };
+        };
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 228) {
             if(resultCode == 300) {
-                timer.scheduleAtFixedRate(timerTaskDecreaseCounter, 0, 1000);
+                timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
             } else {
-                showToast("Разрешение не получено");
+                PublicStaticObjects.showToast("Разрешение не получено");
+            }
+        }
+        if(requestCode == REQUEST_ENABLE_BT) {
+            // resultCode == -1 - OK
+            // resultCode ==  0 - NOT OK
+            if(resultCode == -1) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(() -> {
+                            runServer();
+                        });
+                    }
+                }, 2000);
             }
         }
     }
@@ -156,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             bluetoothAdapter.startDiscovery();
         }
         else {
-            showToast("Вы должны включить Bluetooth");
+            PublicStaticObjects.showToast("Вы должны включить Bluetooth");
         }
     }
 
@@ -165,11 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // checking if bluetooth is enabled
         if(!bluetoothAdapter.isEnabled()) {
             askToEnableBluetooth(bluetoothAdapter);
-        }
-
-        // while it's turning on we should do nothing
-        synchronized (this) {
-            while(bluetoothAdapter.getState() == BluetoothAdapter.STATE_TURNING_ON);
         }
     }
 
@@ -188,10 +205,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
     private void addElementToList(String element) {
         if(arrayAdapter.getPosition(element) == -1) {
             arrayAdapter.add(element);
@@ -202,10 +215,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, REQUEST_ENABLE_BT);
         if(!bluetoothAdapter.isEnabled()) {
-            showToast("Вы должны включить Bluetooth");
+            PublicStaticObjects.showToast("Вы должны включить Bluetooth");
         }
         else {
-            showToast("Bluetooth уже включен");
+            PublicStaticObjects.showToast("Bluetooth уже включен");
         }
     }
 
@@ -245,5 +258,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
     }
-
 }

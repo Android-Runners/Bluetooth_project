@@ -1,31 +1,33 @@
-package com.example.bluetooth_project.connectionStuff;
+package com.example.bluetooth_project.connectionStuff.serverPart;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import com.example.bluetooth_project.ALL.PublicStaticObject;
+import com.example.bluetooth_project.ALL.InputAndOutput;
+import com.example.bluetooth_project.ALL.PublicStaticObjects;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 public class AcceptRunnable implements Runnable {
     private final BluetoothServerSocket serverSocket;
     private final BluetoothAdapter bluetoothAdapter;
-    private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fa");
+    private final UUID MY_UUID = UUID.fromString(PublicStaticObjects.getMyUuid());
 
     public AcceptRunnable() {
-        this.bluetoothAdapter = PublicStaticObject.getBluetoothAdapter();
+        this.bluetoothAdapter = PublicStaticObjects.getBluetoothAdapter();
         BluetoothServerSocket tmp = null;
         try {
             // MY_UUID is the app's UUID string, also used by the client code.
-            Log.e("KEK", "" + (bluetoothAdapter == null));
+            Log.e("in acceptRunnable: ", "" + (bluetoothAdapter == null));
             tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(bluetoothAdapter.getName(), MY_UUID);
-            Log.e("kek", "Socket created");
-
+            Log.e("in acceptRunnable: ", "Socket created");
         } catch (IOException e) {
-            Log.e("kek", "Socket's listen() method failed", e);
+            Log.e("in acceptRunnable: ", "Socket's listen() method failed", e);
+            e.printStackTrace();
         }
         serverSocket = tmp;
     }
@@ -36,18 +38,19 @@ public class AcceptRunnable implements Runnable {
         // Keep listening until exception occurs or a socket is returned.
         while (true) {
             try {
-                Log.e("kek", "Before");
+                Log.e("in acceptRunnable: ", "Before");
                 socket = serverSocket.accept();
-                Log.e("kek", "After");
+                Log.e("in acceptRunnable: ", "After");
             } catch (IOException e) {
-                Log.e("kek", "Socket's accept() method failed", e);
+                Log.e("in acceptRunnable: ", "Socket's accept() method failed", e);
+                e.printStackTrace();
                 break;
             }
 
             if (socket != null) {
                 // A connection was accepted. Perform work associated with
                 // the connection in a separate thread.
-            //    manageMyConnectedSocket(socket);
+                manageMyConnectedSocket(socket);
                 try {
                     serverSocket.close();
                 } catch(IOException e) {
@@ -55,6 +58,23 @@ public class AcceptRunnable implements Runnable {
                 }
                 break;
             }
+        }
+    }
+
+    private void manageMyConnectedSocket(BluetoothSocket socket) {
+        try {
+            InputAndOutput.setInputStream(socket.getInputStream());
+            InputAndOutput.setOutputStream(socket.getOutputStream());
+            InputAndOutput.getOutputStream().write(228);
+            PublicStaticObjects.getMainActivity().runOnUiThread(() -> {
+                try {
+                    PublicStaticObjects.showToast(InputAndOutput.getInputStream().read() + "");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
