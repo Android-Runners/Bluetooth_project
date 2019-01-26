@@ -13,13 +13,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.example.bluetooth_project.ALL.InputAndOutput;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
-import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
+import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,7 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonTurnOn;
     private Button buttonDiscovery;
     private Button buttonDiscoverable;
+    private Button buttonSend;
     private ListView listView;
+    private EditText editText;
 
     private ArrayAdapter<String> arrayAdapter;
     private BluetoothAdapter bluetoothAdapter;
@@ -71,11 +75,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonTurnOn = findViewById(R.id.buttonTurnOn);
         buttonDiscovery = findViewById(R.id.buttonDiscovery);
         buttonDiscoverable = findViewById(R.id.buttonDiscoverable);
+        buttonSend = findViewById(R.id.buttonSend);
         listView = findViewById(R.id.list);
+        editText = findViewById(R.id.editText);
 
         buttonTurnOn.setOnClickListener(this);
         buttonDiscovery.setOnClickListener(this);
         buttonDiscoverable.setOnClickListener(this);
+        buttonSend.setOnClickListener(this);
 
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
         //TODO (Выровнять по центру)
@@ -256,6 +263,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.buttonDiscoverable:
                 buttonDiscoverableAction();
                 break;
+            case R.id.buttonSend:
+                buttonSendAction();
+                break;
+        }
+    }
+
+    private void buttonSendAction() {
+        if(PublicStaticObjects.getIsConnected()) {
+            String toSend = editText.getText().toString();
+            // TODO (toSend проверить как в проекте)
+            try {
+                InputAndOutput.getOutputStream().write(toSend.getBytes());
+                InputAndOutput.getOutputStream().flush();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

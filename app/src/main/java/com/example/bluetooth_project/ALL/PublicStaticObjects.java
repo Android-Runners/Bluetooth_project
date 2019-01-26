@@ -17,6 +17,7 @@ public class PublicStaticObjects {
     private static MainActivity mainActivity;
     private static BluetoothAdapter bluetoothAdapter;
     private static String MY_UUID = "f890841e-0131-4d6e-b1e6-656bd3a1d25d";
+    private static Boolean isConnected = false;
 
     // getters and setters:
     public static String getMyUuid() {
@@ -37,6 +38,14 @@ public class PublicStaticObjects {
 
     public static void setMainActivity(MainActivity mainActivity) {
         PublicStaticObjects.mainActivity = mainActivity;
+    }
+
+    public static Boolean getIsConnected() {
+        return isConnected;
+    }
+
+    public static void setIsConnected(Boolean isConnected) {
+        PublicStaticObjects.isConnected = isConnected;
     }
 
     private PublicStaticObjects() {}

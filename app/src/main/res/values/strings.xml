@@ -3,4 +3,5 @@
     <string name="turn_on">Включить Bluetooth</string>
     <string name="discoverable">Сделать устройство\nвидимым</string>
     <string name="start_discovery">Начать поиск</string>
+    <string name="send">Отправить</string>
 </resources>

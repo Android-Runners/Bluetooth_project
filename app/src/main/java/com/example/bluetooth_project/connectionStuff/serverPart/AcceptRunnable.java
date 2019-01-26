@@ -10,7 +10,6 @@ import com.example.bluetooth_project.ALL.PublicStaticObjects;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 
 public class AcceptRunnable implements Runnable {
     private final BluetoothServerSocket serverSocket;
@@ -40,6 +39,7 @@ public class AcceptRunnable implements Runnable {
             try {
                 Log.e("in acceptRunnable: ", "Before");
                 socket = serverSocket.accept();
+                PublicStaticObjects.setIsConnected(true);
                 Log.e("in acceptRunnable: ", "After");
             } catch (IOException e) {
                 Log.e("in acceptRunnable: ", "Socket's accept() method failed", e);
@@ -53,6 +53,7 @@ public class AcceptRunnable implements Runnable {
                 manageMyConnectedSocket(socket);
                 try {
                     serverSocket.close();
+                    PublicStaticObjects.setIsConnected(false);
                 } catch(IOException e) {
                     e.printStackTrace();
                 }
@@ -65,14 +66,6 @@ public class AcceptRunnable implements Runnable {
         try {
             InputAndOutput.setInputStream(socket.getInputStream());
             InputAndOutput.setOutputStream(socket.getOutputStream());
-            InputAndOutput.getOutputStream().write(228);
-            PublicStaticObjects.getMainActivity().runOnUiThread(() -> {
-                try {
-                    PublicStaticObjects.showToast(InputAndOutput.getInputStream().read() + "");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,6 +74,7 @@ public class AcceptRunnable implements Runnable {
     public void cancel() {
         try {
             serverSocket.close();
+            PublicStaticObjects.setIsConnected(false);
         } catch (IOException e) {
             Log.e("kek", "Could not close the connect socket", e);
         }

@@ -51,14 +51,6 @@ public class ConnectRunnable implements Runnable {
         try {
             InputAndOutput.setInputStream(socket.getInputStream());
             InputAndOutput.setOutputStream(socket.getOutputStream());
-            InputAndOutput.getOutputStream().write(228);
-            PublicStaticObjects.getMainActivity().runOnUiThread(() -> {
-                try {
-                    PublicStaticObjects.showToast(InputAndOutput.getInputStream().read() + "");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,11 +62,13 @@ public class ConnectRunnable implements Runnable {
             // until it succeeds or throws an exception.
             Log.e("in connectRunnable: ", "Before");
             socket.connect();
+            PublicStaticObjects.setIsConnected(true);
             Log.e("in connectRunnable: ", "After");
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {
                 socket.close();
+                PublicStaticObjects.setIsConnected(false);
             } catch (IOException closeException) {
                 Log.e("in connectRunnable: ", "Could not close the client socket", closeException);
             }
@@ -86,6 +80,7 @@ public class ConnectRunnable implements Runnable {
     public void cancel() {
         try {
             socket.close();
+            PublicStaticObjects.setIsConnected(false);
         } catch (IOException e) {
             Log.e("lol", "Could not close the client socket", e);
         }
