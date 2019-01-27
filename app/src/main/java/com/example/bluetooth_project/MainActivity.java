@@ -9,12 +9,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.bluetooth_project.ALL.InputAndOutput;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
@@ -47,7 +51,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AcceptRunnable acceptRunnable;
     private ConnectRunnable connectRunnable;
-    private Thread threadAccept, threadConnect;
+    private Thread threadAccept;
+    private Thread threadConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +90,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonDiscoverable.setOnClickListener(this);
         buttonSend.setOnClickListener(this);
 
-        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
-        //TODO (Выровнять по центру)
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<>()) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                TextView textView = (TextView) super.getView(position, convertView, parent);
+                // making center align
+                textView.setGravity(Gravity.CENTER);
+                return textView;
+            }
+        };
 
         listView.setAdapter(arrayAdapter);
 
@@ -111,10 +124,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         threadAccept.start();
     }
 
-    private void stopServer() {
-        acceptRunnable.cancel();
-        threadAccept.interrupt();
-    }
+//    private void stopServer() {
+//        acceptRunnable.cancel();
+//        threadAccept.interrupt();
+//    }
 
     private Timer timer = new Timer();
 
@@ -147,9 +160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 addElementToList(device.getName() + " " + device.getAddress());
                 devices.add(device);
             }
-            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                // TODO
-            }
+//            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+//            }
         }
     };
 
