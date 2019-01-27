@@ -39,7 +39,6 @@ public class AcceptRunnable implements Runnable {
             try {
                 Log.e("in acceptRunnable: ", "Before");
                 socket = serverSocket.accept();
-                PublicStaticObjects.setIsConnected(true);
                 Log.e("in acceptRunnable: ", "After");
             } catch (IOException e) {
                 Log.e("in acceptRunnable: ", "Socket's accept() method failed", e);
@@ -66,6 +65,9 @@ public class AcceptRunnable implements Runnable {
         try {
             InputAndOutput.setInputStream(socket.getInputStream());
             InputAndOutput.setOutputStream(socket.getOutputStream());
+            PublicStaticObjects.setIsConnected(true);
+            PublicStaticObjects.getMainActivity().runOnUiThread(
+                    () -> PublicStaticObjects.getMainActivity().getArrayAdapter().clear());
         } catch (IOException e) {
             e.printStackTrace();
         }

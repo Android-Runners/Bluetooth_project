@@ -18,6 +18,7 @@ import android.widget.ListView;
 
 import com.example.bluetooth_project.ALL.InputAndOutput;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
+import com.example.bluetooth_project.connectionStuff.Listener;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
 
@@ -98,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(bluetoothAdapter.isEnabled()) {
             runServer();
         }
+
+        new Thread(new Listener()).start();
     }
 
     private void runServer() {
@@ -111,12 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void stopServer() {
         acceptRunnable.cancel();
         threadAccept.interrupt();
-    }
-
-    private void listViewAction(int i) {
-        connectRunnable = new ConnectRunnable(devices.get(i));
-        threadConnect = new Thread(connectRunnable);
-        threadConnect.start();
     }
 
     private Timer timer = new Timer();
@@ -139,62 +136,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         };
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 228) {
-            if(resultCode == 300) {
-                timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
-            } else {
-                PublicStaticObjects.showToast("Разрешение не получено");
-            }
-        }
-        if(requestCode == REQUEST_ENABLE_BT) {
-            // resultCode == -1 - OK
-            // resultCode ==  0 - NOT OK
-            if(resultCode == -1) {
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(() -> {
-                            runServer();
-                        });
-                    }
-                }, 2000);
-            }
-        }
-    }
-
-    private void buttonDiscoverableAction() {
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, MAX_TIME_DISCOVER_SECONDS);
-        startActivityForResult(discoverableIntent, DISCOVERY_REQUEST);
-    }
-
-    private void buttonDiscoveryAction() {
-        if(bluetoothAdapter.isEnabled()) {
-            arrayAdapter.clear();
-            devices.clear();
-            // if is already discovering discover again
-            if(bluetoothAdapter.isDiscovering()) {
-                bluetoothAdapter.cancelDiscovery();
-            }
-            bluetoothAdapter.startDiscovery();
-        }
-        else {
-            PublicStaticObjects.showToast("Вы должны включить Bluetooth");
-        }
-    }
-
-    private void buttonTurnOnAction() {
-
-        // checking if bluetooth is enabled
-        if(!bluetoothAdapter.isEnabled()) {
-            askToEnableBluetooth(bluetoothAdapter);
-        }
     }
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -243,6 +184,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // actions:
+
+    private void buttonDiscoverableAction() {
+        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, MAX_TIME_DISCOVER_SECONDS);
+        startActivityForResult(discoverableIntent, DISCOVERY_REQUEST);
+    }
+
+    private void buttonDiscoveryAction() {
+        if(bluetoothAdapter.isEnabled()) {
+            arrayAdapter.clear();
+            devices.clear();
+            // if is already discovering discover again
+            if(bluetoothAdapter.isDiscovering()) {
+                bluetoothAdapter.cancelDiscovery();
+            }
+            bluetoothAdapter.startDiscovery();
+        }
+        else {
+            PublicStaticObjects.showToast("Вы должны включить Bluetooth");
+        }
+    }
+
+    private void buttonTurnOnAction() {
+
+        // checking if bluetooth is enabled
+        if(!bluetoothAdapter.isEnabled()) {
+            askToEnableBluetooth(bluetoothAdapter);
+        }
+    }
+
+    private void buttonSendAction() {
+        if(PublicStaticObjects.getIsConnected()) {
+            String toSend = editText.getText().toString();
+            if(editText.getText().toString().length() != 6) {
+                PublicStaticObjects.showToast("Серийник должен быть 6-тизначным");
+            }
+            else {
+                try {
+                    byte[] buffer = new byte[6 + 3];
+                    buffer[0] = 2;
+                    buffer[1] = 2;
+                    buffer[2] = 8;
+                    System.arraycopy(toSend.getBytes(), 0, buffer, 3, 6);
+                    InputAndOutput.getOutputStream().write(buffer);
+                    InputAndOutput.getOutputStream().flush();
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+    }
+
+    private void listViewAction(int i) {
+        connectRunnable = new ConnectRunnable(devices.get(i));
+        threadConnect = new Thread(connectRunnable);
+        threadConnect.start();
+    }
+
+    // override methods:
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -269,17 +272,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void buttonSendAction() {
-        if(PublicStaticObjects.getIsConnected()) {
-            String toSend = editText.getText().toString();
-            // TODO (toSend проверить как в проекте)
-            try {
-                InputAndOutput.getOutputStream().write(toSend.getBytes());
-                InputAndOutput.getOutputStream().flush();
-            } catch(IOException e) {
-                e.printStackTrace();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 228) {
+            if(resultCode == 300) {
+                timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
+            } else {
+                PublicStaticObjects.showToast("Разрешение не получено");
             }
-
         }
+        if(requestCode == REQUEST_ENABLE_BT) {
+            // resultCode == -1 - OK
+            // resultCode ==  0 - NOT OK
+            if(resultCode == -1) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(() -> runServer());
+                    }
+                }, 2000);
+            }
+        }
+    }
+
+    // getters and setters:
+
+    public EditText getEditText() {
+        return editText;
+    }
+
+    public Button getButtonSend() {
+        return buttonSend;
+    }
+
+    public ArrayAdapter<String> getArrayAdapter() {
+        return arrayAdapter;
     }
 }
