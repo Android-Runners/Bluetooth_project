@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ConnectRunnable connectRunnable;
     private Thread threadAccept;
     private Thread threadConnect;
+    private IntentFilter filter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,11 +106,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setAdapter(arrayAdapter);
 
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
         filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> listViewAction(i) );
@@ -166,18 +168,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 devices.add(device);
             }
             else if(BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                PublicStaticObjects.showToast("kekek");
+                buttonDiscoverable.setText(getResources().getString(R.string.discoverable));
+                timer.cancel();
+                timer.purge();
+                editText.setVisibility(View.INVISIBLE);
+                buttonSend.setVisibility(View.INVISIBLE);
             }
-
-//            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-//            }
+            else if(BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                editText.setVisibility(View.VISIBLE);
+                buttonSend.setVisibility(View.VISIBLE);
+                arrayAdapter.clear();
+                devices.clear();
+            }
+            else if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
+                    unregisterReceiver(receiver);
+                }
+                else if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_ON) {
+                    registerReceiver(receiver, filter);
+                }
+            }
         }
     };
 
     private void addElementToList(String element) {
         if(arrayAdapter.getPosition(element) == -1) {
             arrayAdapter.add(element);
-
         }
     }
 
@@ -216,8 +232,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void buttonDiscoveryAction() {
         if(bluetoothAdapter.isEnabled()) {
-            arrayAdapter.clear();
+            /*arrayAdapter.clear();
             devices.clear();
+            editText.setVisibility(View.INVISIBLE);
+            buttonSend.setVisibility(View.INVISIBLE);*/
             // if is already discovering discover again
             if(bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.cancelDiscovery();

@@ -19,6 +19,7 @@ public class ConnectRunnable implements Runnable {
     private final UUID MY_UUID = UUID.fromString(PublicStaticObjects.getMyUuid());
 
     public ConnectRunnable(BluetoothDevice device) {
+
         // Use a temporary object that is later assigned to mmSocket
         // because mmSocket is final.
         BluetoothSocket tmp = null;
