@@ -52,7 +52,6 @@ public class AcceptRunnable implements Runnable {
                 manageMyConnectedSocket(socket);
                 try {
                     serverSocket.close();
-                    PublicStaticObjects.setIsConnected(false);
                 } catch(IOException e) {
                     e.printStackTrace();
                 }
@@ -68,6 +67,7 @@ public class AcceptRunnable implements Runnable {
             PublicStaticObjects.setIsConnected(true);
             PublicStaticObjects.getMainActivity().runOnUiThread(
                     () -> PublicStaticObjects.getMainActivity().getArrayAdapter().clear());
+            PublicStaticObjects.getMainActivity().getDevices().clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,6 +77,7 @@ public class AcceptRunnable implements Runnable {
         try {
             serverSocket.close();
             PublicStaticObjects.setIsConnected(false);
+            PublicStaticObjects.showToast("close (AcceptRunnable)");
         } catch (IOException e) {
             Log.e("kek", "Could not close the connect socket", e);
         }

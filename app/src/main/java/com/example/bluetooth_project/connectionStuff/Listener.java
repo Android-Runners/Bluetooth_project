@@ -32,7 +32,31 @@ public class Listener implements Runnable {
                         System.arraycopy(buffer, 3, buffer2, 0, 6);
                         PublicStaticObjects.getMainActivity().runOnUiThread(() ->
                                 PublicStaticObjects.getMainActivity().getEditText().setText(new String(buffer2).toCharArray(), 0, 6));
-                    }
+                    } /*else {
+                        String s = new String(buffer);
+                        if(InputAndOutput.getOutputStream() != null){
+                            switch(s) {
+                                case "heyhello!": // Приняли запрос на подтверждение соединения
+                                    s = "imherehey";
+                                    System.arraycopy(s.getBytes(), 0, buffer, 0, 9);
+                                    try {
+                                        InputAndOutput.getOutputStream().write(buffer);
+                                        InputAndOutput.getOutputStream().flush();
+                                    } catch(IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+
+                                case "imherehey": // Приняли ответ - подтверждение соединения
+                                    PublicStaticObjects.setIsConnected(true);
+                                    PublicStaticObjects.getMainActivity().runOnUiThread(() -> {
+                                        PublicStaticObjects.showToast("Приняли сообщение. Соединение есть");
+                                    });
+                                    break;
+                            }
+                        }
+                    }*/
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

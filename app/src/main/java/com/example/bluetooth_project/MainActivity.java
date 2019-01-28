@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.example.bluetooth_project.ALL.InputAndOutput;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
 import com.example.bluetooth_project.connectionStuff.Listener;
+import com.example.bluetooth_project.connectionStuff.ListenerConnection;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
 
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonDiscovery;
     private Button buttonDiscoverable;
     private Button buttonSend;
+    private Button buttonRefresh;
     private ListView listView;
     private EditText editText;
 
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonDiscovery = findViewById(R.id.buttonDiscovery);
         buttonDiscoverable = findViewById(R.id.buttonDiscoverable);
         buttonSend = findViewById(R.id.buttonSend);
+        buttonRefresh = findViewById(R.id.buttonRefresh);
         listView = findViewById(R.id.list);
         editText = findViewById(R.id.editText);
 
@@ -89,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonDiscovery.setOnClickListener(this);
         buttonDiscoverable.setOnClickListener(this);
         buttonSend.setOnClickListener(this);
-
+        buttonRefresh.setOnClickListener(this);
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -114,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         new Thread(new Listener()).start();
+        new Thread(new ListenerConnection()).start();
     }
 
     private void runServer() {
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 runOnUiThread(() ->
                     buttonDiscoverable.setText(getResources().getString(R.string.discoverable) +
                                                 " (" + --secondsLeft + ")"));
-                if(secondsLeft == 0) {
+                if(secondsLeft == 0 || !bluetoothAdapter.isEnabled()) {
                     runOnUiThread(() -> {
                         buttonDiscoverable.setText(getResources().getString(R.string.discoverable));
                         timer.cancel();
@@ -160,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 addElementToList(device.getName() + " " + device.getAddress());
                 devices.add(device);
             }
+
 //            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 //            }
         }
@@ -168,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addElementToList(String element) {
         if(arrayAdapter.getPosition(element) == -1) {
             arrayAdapter.add(element);
+
         }
     }
 
@@ -222,13 +228,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void buttonTurnOnAction() {
 
         // checking if bluetooth is enabled
-        if(!bluetoothAdapter.isEnabled()) {
-            askToEnableBluetooth(bluetoothAdapter);
-        }
+        askToEnableBluetooth(bluetoothAdapter);
     }
 
     private void buttonSendAction() {
-        if(PublicStaticObjects.getIsConnected()) {
+        if(InputAndOutput.getOutputStream() != null) {
             String toSend = editText.getText().toString();
             if(editText.getText().toString().length() != 6) {
                 PublicStaticObjects.showToast("Серийник должен быть 6-тизначным");
@@ -256,6 +260,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         threadConnect.start();
     }
 
+    /*private void sendCheck() {
+        if(InputAndOutput.getOutputStream() != null) {
+            String toSend = "heyhello!";
+            try {
+                byte[] buffer = new byte[6 + 3];
+                System.arraycopy(toSend.getBytes(), 0, buffer, 0, 9);
+                InputAndOutput.getOutputStream().write(buffer);
+                InputAndOutput.getOutputStream().flush();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            PublicStaticObjects.showToast("Соединение отсутствует");
+            //TODO убрать editText, очистить listView ...
+        }
+    }*/
     // override methods:
 
     @Override
@@ -280,6 +300,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.buttonSend:
                 buttonSendAction();
+                break;
+            case R.id.buttonRefresh:
+
                 break;
         }
     }
@@ -317,6 +340,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public Button getButtonSend() {
         return buttonSend;
+    }
+
+    public ArrayList<BluetoothDevice> getDevices() {
+        return devices;
     }
 
     public ArrayAdapter<String> getArrayAdapter() {

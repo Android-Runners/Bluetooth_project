@@ -33,6 +33,7 @@ public class ConnectRunnable implements Runnable {
             Log.e("in connectRunnable: ", "Socket's create() method failed", e);
         }
         socket = tmp;
+        PublicStaticObjects.setSocket(socket);
     }
 
     @Override
@@ -54,6 +55,7 @@ public class ConnectRunnable implements Runnable {
             PublicStaticObjects.setIsConnected(true);
             PublicStaticObjects.getMainActivity().runOnUiThread(
                     () -> PublicStaticObjects.getMainActivity().getArrayAdapter().clear());
+            PublicStaticObjects.getMainActivity().getDevices().clear();
             // TODO: stop discovering
         } catch (IOException e) {
             e.printStackTrace();
@@ -83,6 +85,8 @@ public class ConnectRunnable implements Runnable {
         try {
             socket.close();
             PublicStaticObjects.setIsConnected(false);
+            PublicStaticObjects.showToast("close (ConnectRunnable)");
+
         } catch (IOException e) {
             Log.e("lol", "Could not close the client socket", e);
         }

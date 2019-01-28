@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">bluetoothExample2</string>
+    <string name="app_name">Настройка ароматизатора</string>
     <string name="turn_on">Включить Bluetooth</string>
     <string name="discoverable">Сделать устройство\nвидимым</string>
+    <string name="refresh">Обновить</string>
     <string name="start_discovery">Начать поиск</string>
     <string name="send">Отправить</string>
 </resources>
