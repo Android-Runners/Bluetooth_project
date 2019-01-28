@@ -23,7 +23,6 @@ import android.widget.TextView;
 import com.example.bluetooth_project.ALL.InputAndOutput;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
 import com.example.bluetooth_project.connectionStuff.Listener;
-import com.example.bluetooth_project.connectionStuff.ListenerConnection;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
 
@@ -108,6 +107,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(receiver, filter);
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> listViewAction(i) );
@@ -117,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         new Thread(new Listener()).start();
-        new Thread(new ListenerConnection()).start();
     }
 
     private void runServer() {
@@ -163,6 +164,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 addElementToList(device.getName() + " " + device.getAddress());
                 devices.add(device);
+            }
+            else if(BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                PublicStaticObjects.showToast("kekek");
             }
 
 //            else if(BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
