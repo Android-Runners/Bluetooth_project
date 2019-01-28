@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -131,16 +132,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         threadAccept.start();
     }
 
-//    private void stopServer() {
-//        acceptRunnable.cancel();
-//        threadAccept.interrupt();
-//    }
+    private void stopServer() {
+        acceptRunnable.cancel();
+        threadAccept.interrupt();
+    }
 
     private Timer timer = new Timer();
 
     private TimerTask newTimerTaskDecreaseCounter() {
         return new TimerTask() {
-            int secondsLeft = MAX_TIME_DISCOVER_SECONDS;
+            private int secondsLeft = MAX_TIME_DISCOVER_SECONDS;
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
@@ -169,8 +170,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             else if(BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
                 buttonDiscoverable.setText(getResources().getString(R.string.discoverable));
-                timer.cancel();
-                timer.purge();
+                try {
+                    timer.cancel();
+                    timer.purge();
+                } catch (Throwable e) {
+                    Log.e("in MainActivity", "timer threw exception");
+                }
                 editText.setVisibility(View.INVISIBLE);
                 buttonSend.setVisibility(View.INVISIBLE);
             }
@@ -183,8 +188,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             else if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
                     unregisterReceiver(receiver);
+                    stopServer();
                 }
                 else if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_ON) {
+                    runServer();
                     registerReceiver(receiver, filter);
                 }
             }
@@ -232,15 +239,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void buttonDiscoveryAction() {
         if(bluetoothAdapter.isEnabled()) {
-            /*arrayAdapter.clear();
-            devices.clear();
-            editText.setVisibility(View.INVISIBLE);
-            buttonSend.setVisibility(View.INVISIBLE);*/
             // if is already discovering discover again
             if(bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.cancelDiscovery();
             }
-            bluetoothAdapter.startDiscovery();
+            try {
+                bluetoothAdapter.startDiscovery();
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         }
         else {
             PublicStaticObjects.showToast("Вы должны включить Bluetooth");

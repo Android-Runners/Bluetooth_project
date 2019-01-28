@@ -77,7 +77,7 @@ public class AcceptRunnable implements Runnable {
         try {
             serverSocket.close();
             PublicStaticObjects.setIsConnected(false);
-            PublicStaticObjects.showToast("close (AcceptRunnable)");
+//            PublicStaticObjects.showToast("close (AcceptRunnable)");
         } catch (IOException e) {
             Log.e("kek", "Could not close the connect socket", e);
         }
