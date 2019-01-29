@@ -10,21 +10,30 @@ public class Listener implements Runnable {
     @Override
     public void run() {
 
+        boolean isFirst = true;
+
         while(true) {
             if(InputAndOutput.getInputStream() == null) {
                 continue;
+            }
+            else {
+                if(isFirst) {
+                    PublicStaticObjects.getMainActivity().runOnUiThread(() -> PublicStaticObjects.showToast("Не null"));
+                    isFirst = false;
+                }
             }
             try {
                 // size must be 6 + 3, but who knows
                 byte[] buffer = new byte[6 + 3];
                 int size = InputAndOutput.getInputStream().read(buffer);
-                if(buffer[0] == 2 && buffer[1] == 2 && buffer[2] == 8 && size == 6 + 3) {
+                if(size == 6 + 3 && buffer[0] == 2 && buffer[1] == 2 && buffer[2] == 8) {
                     byte[] buffer2 = new byte[6];
                     System.arraycopy(buffer, 3, buffer2, 0, 6);
                     PublicStaticObjects.getMainActivity().runOnUiThread(() ->
                             PublicStaticObjects.getMainActivity().getEditText().setText(new String(buffer2).toCharArray(), 0, 6));
                 }
-                else if(buffer[0] == 0 && buffer[1] == 1 && buffer[2] == 2 && size == 3) {
+                else if(size == 3 && buffer[0] == 0 && buffer[1] == 1 && buffer[2] == 2) {
+//                    isInitialized = false;
                     /*PublicStaticObjects.getMainActivity().runOnUiThread(() ->
                             PublicStaticObjects.showToast("Listener, disconnecting"));*/
 

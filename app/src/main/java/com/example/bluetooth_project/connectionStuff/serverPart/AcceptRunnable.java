@@ -42,7 +42,12 @@ public class AcceptRunnable implements Runnable {
                 /*PublicStaticObjects.getMainActivity().runOnUiThread(
                         () -> PublicStaticObjects.showToast("Accept, before"));*/
 
+                Log.d("WTF!!!!!!!!!!!!!!!", "It begins");
+
                 socket = serverSocket.accept();
+
+                Log.d("WTF!!!!!!!!!!!!!!!", "WHY DOES IT WORK?????????????????????????????????/");
+                Log.e("WTF!!!!!!!!!!!!!!!", "WHY DOES IT WORK?????????????????????????????????/");
 
                 /*String s = socket.getRemoteDevice().getName();
                 PublicStaticObjects.getMainActivity().runOnUiThread(

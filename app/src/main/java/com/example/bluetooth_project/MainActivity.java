@@ -125,16 +125,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> listViewAction(i) );
 
-        editText.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    buttonSendAction();
-                    //return true;
-                }
-                return false;
+        editText.setOnKeyListener((v, keyCode, event) -> {
+            // If the event is a key-down event on the "enter" button
+//            if(event.getAction() == KeyEvent.ACTION_DOWN) {
+//                PublicStaticObjects.showToast(keyCode + "");
+//            }
+            if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                    (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                buttonSendAction();
+                //return true;
             }
+            return false;
         });
 
         if(bluetoothAdapter.isEnabled()) {
@@ -147,9 +148,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void runServer() {
-        if(acceptRunnable == null) {
+//        if(acceptRunnable == null) {
             acceptRunnable = new AcceptRunnable();
-        }
+//        }
         threadAccept = new Thread(acceptRunnable);
         threadAccept.start();
     }
@@ -321,7 +322,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buffer[0] = 2;
                     buffer[1] = 2;
                     buffer[2] = 8;
+                    PublicStaticObjects.showToast("CYKA");
                     System.arraycopy(toSend.getBytes(), 0, buffer, 3, 6);
+                    InputAndOutput.getOutputStream().flush();
                     InputAndOutput.getOutputStream().write(buffer);
                     InputAndOutput.getOutputStream().flush();
                 } catch(IOException e) {
@@ -336,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonStop.setText(R.string.stop_process);
             try {
                 byte[] buffer = new byte[3];
-                buffer[0] = 0;
+//                buffer[0] = 0;
                 buffer[1] = 1;
                 buffer[2] = 2;
                 InputAndOutput.getOutputStream().write(buffer);

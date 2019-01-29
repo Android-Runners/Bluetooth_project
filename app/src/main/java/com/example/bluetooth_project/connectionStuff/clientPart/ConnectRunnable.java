@@ -56,7 +56,11 @@ public class ConnectRunnable implements Runnable {
             PublicStaticObjects.getMainActivity().runOnUiThread(
                     () -> PublicStaticObjects.getMainActivity().getArrayAdapter().clear());
             PublicStaticObjects.getMainActivity().getDevices().clear();
-            // TODO: stop discovering
+            try {
+//                InputAndOutput.getOutputStream().write(new byte[]{2, 2, 8, 0, 0, 0, 0, 0, 0});
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,7 +76,7 @@ public class ConnectRunnable implements Runnable {
 
             PublicStaticObjects.setIsConnected(true);
 
-            Log.e("in connectRunnable: ", "After");
+            Log.e("in connectRunnable: ", "After " + (socket.getRemoteDevice().getName()));
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {
