@@ -2,6 +2,7 @@ package com.example.bluetooth_project;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -16,6 +17,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         PublicStaticObjects.setEditText(editText);
 
-    //    buttonTurnOn.setOnClickListener(this);
         buttonDiscovery.setOnClickListener(this);
         buttonDiscoverable.setOnClickListener(this);
         buttonSend.setOnClickListener(this);
@@ -127,13 +128,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         editText.setOnKeyListener((v, keyCode, event) -> {
             // If the event is a key-down event on the "enter" button
-//            if(event.getAction() == KeyEvent.ACTION_DOWN) {
-//                PublicStaticObjects.showToast(keyCode + "");
-//            }
             if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                     (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 buttonSendAction();
-                //return true;
             }
             return false;
         });
@@ -148,9 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void runServer() {
-//        if(acceptRunnable == null) {
-            acceptRunnable = new AcceptRunnable();
-//        }
+        acceptRunnable = new AcceptRunnable();
         threadAccept = new Thread(acceptRunnable);
         threadAccept.start();
     }
@@ -209,8 +204,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (Throwable e) {
                     Log.e("in MainActivity", "timer threw exception");
                 }
+                hideKeyboard();
                 editText.setVisibility(View.INVISIBLE);
                 editText.setText("");
+
                 buttonStop.setEnabled(false);
                 buttonStop.setText(R.string.stop);
                 setButtonsEnabled(true);
@@ -230,8 +227,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     unregisterReceiver(receiver);
                     stopServer();
 
+                    hideKeyboard();
                     editText.setVisibility(View.INVISIBLE);
                     editText.setText("");
+
                     buttonStop.setEnabled(false);
                     buttonStop.setText(R.string.stop);
                     setButtonsEnabled(true);
@@ -243,6 +242,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     };
+
+    public void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = this.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(this);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
     private void setButtonsEnabled(Boolean b) {
         buttonDiscovery.setEnabled(b);
@@ -259,9 +269,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void askToEnableBluetooth(BluetoothAdapter bluetoothAdapter) {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, REQUEST_ENABLE_BT);
-        /*if(bluetoothAdapter.isEnabled()) {
-            PublicStaticObjects.showToast(getResources().getString(R.string.bt_already));
-        }*/
     }
 
     private void checkPermission() {
@@ -281,7 +288,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // actions:
 
     private void buttonDiscoverableAction() {
-        //PublicStaticObjects.showToast("buttonDiscoverableAction()");
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, MAX_TIME_DISCOVER_SECONDS);
         startActivityForResult(discoverableIntent, DISCOVERY_REQUEST);
@@ -322,7 +328,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     buffer[0] = 2;
                     buffer[1] = 2;
                     buffer[2] = 8;
-                    PublicStaticObjects.showToast("CYKA");
                     System.arraycopy(toSend.getBytes(), 0, buffer, 3, 6);
                     InputAndOutput.getOutputStream().flush();
                     InputAndOutput.getOutputStream().write(buffer);
@@ -405,7 +410,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void run() {
                             runOnUiThread(() -> {
-                            //    PublicStaticObjects.showToast("onActivityResult, runServer()");
                                 runServer();
                             });
                         }
@@ -415,7 +419,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch(Throwable e) {
             e.printStackTrace();
             Log.e("LLLLOOOOLLLLL", e.getMessage());
-        //    PublicStaticObjects.showToast(e.getMessage());
         }
     }
 

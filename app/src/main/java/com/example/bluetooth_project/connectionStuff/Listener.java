@@ -10,17 +10,9 @@ public class Listener implements Runnable {
     @Override
     public void run() {
 
-        boolean isFirst = true;
-
         while(true) {
             if(InputAndOutput.getInputStream() == null) {
                 continue;
-            }
-            else {
-                if(isFirst) {
-                    PublicStaticObjects.getMainActivity().runOnUiThread(() -> PublicStaticObjects.showToast("Не null"));
-                    isFirst = false;
-                }
             }
             try {
                 // size must be 6 + 3, but who knows
@@ -33,10 +25,6 @@ public class Listener implements Runnable {
                             PublicStaticObjects.getMainActivity().getEditText().setText(new String(buffer2).toCharArray(), 0, 6));
                 }
                 else if(size == 3 && buffer[0] == 0 && buffer[1] == 1 && buffer[2] == 2) {
-//                    isInitialized = false;
-                    /*PublicStaticObjects.getMainActivity().runOnUiThread(() ->
-                            PublicStaticObjects.showToast("Listener, disconnecting"));*/
-
                     if(InputAndOutput.getInputStream() != null) {
                         try {
                             InputAndOutput.getInputStream().close();
@@ -63,9 +51,6 @@ public class Listener implements Runnable {
                         }
                         PublicStaticObjects.setSocket(null);
                     }
-
-                    //PublicStaticObjects.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
-                    // PublicStaticObjects.setMyUuid(PublicStaticObjects.getMyUuid() + "1");
                 }
             } catch (IOException e) {
                 e.printStackTrace();

@@ -39,27 +39,13 @@ public class AcceptRunnable implements Runnable {
             try {
                 Log.e("in acceptRunnable: ", "Before");
 
-                /*PublicStaticObjects.getMainActivity().runOnUiThread(
-                        () -> PublicStaticObjects.showToast("Accept, before"));*/
-
-                Log.d("WTF!!!!!!!!!!!!!!!", "It begins");
-
                 socket = serverSocket.accept();
-
-                Log.d("WTF!!!!!!!!!!!!!!!", "WHY DOES IT WORK?????????????????????????????????/");
-                Log.e("WTF!!!!!!!!!!!!!!!", "WHY DOES IT WORK?????????????????????????????????/");
-
-                /*String s = socket.getRemoteDevice().getName();
-                PublicStaticObjects.getMainActivity().runOnUiThread(
-                        () -> PublicStaticObjects.showToast("Accept, after " + s));*/
 
                 PublicStaticObjects.setIsConnected(true);
 
                 Log.e("in acceptRunnable: ", "After");
             } catch (IOException e) {
                 Log.e("in acceptRunnable: ", "Socket's accept() method failed", e);
-                /*PublicStaticObjects.getMainActivity().runOnUiThread(
-                        () -> PublicStaticObjects.showToast("AcceptRunnable: " + e.getMessage()));*/
                 e.printStackTrace();
                 break;
             }
