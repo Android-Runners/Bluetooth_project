@@ -288,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void buttonDiscoveryAction() {
         if(bluetoothAdapter.isEnabled()) {
+            buttonDiscovery.setText(R.string.discovering);
             // if is already discovering discover again
             if(bluetoothAdapter.isDiscovering()) {
                 bluetoothAdapter.cancelDiscovery();
@@ -366,7 +367,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonDiscovery:
-                buttonDiscovery.setText(R.string.discovering);
                 buttonDiscoveryAction();
                 break;
             case R.id.buttonDiscoverable:
