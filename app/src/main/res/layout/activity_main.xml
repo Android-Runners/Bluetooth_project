@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
     tools:context="com.example.bluetooth_project.MainActivity">
 
-    <RelativeLayout
+
+    <!--<RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">-->
+   <!-- <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
             android:orientation="vertical">
 
             <LinearLayout
@@ -24,11 +27,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <Button
+                <!--<Button
                     android:id="@+id/buttonTurnOn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/turn_on" />
+                    android:text="@string/turn_on" />-->
 
                 <Button
                     android:id="@+id/buttonDiscovery"
@@ -37,41 +40,46 @@
                     android:text="@string/start_discovery" />
 
                 <Button
+                    android:id="@+id/buttonDiscoverable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/buttonDiscoverable"
-                    android:text="@string/discoverable"/>
+                    android:text="@string/discoverable" />
 
                 <Button
-                    android:id="@+id/buttonRefresh"
+                    android:id="@+id/buttonStop"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/refresh" />
+                    android:text="@string/stop" />
 
             </LinearLayout>
 
             <ListView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="170dp"/>
 
             <EditText
                 android:id="@+id/editText"
-                android:layout_width="250dp"
+                android:layout_width="200dp"
                 android:layout_height="50dp"
-                android:visibility="invisible"
-                android:inputType="numberSigned" />
+                android:inputType="numberSigned"
+                android:hint="@string/hint"
+                android:visibility="invisible" />
 
             <Button
                 android:id="@+id/buttonSend"
-                android:text="@string/send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/send"
                 android:visibility="invisible" />
 
         </LinearLayout>
 
+    <!--</ScrollView>-->
 
-    </RelativeLayout>
+    <!--
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"-->
+    <!--</RelativeLayout>-->
 
-</android.support.constraint.ConstraintLayout>
+</ScrollView>

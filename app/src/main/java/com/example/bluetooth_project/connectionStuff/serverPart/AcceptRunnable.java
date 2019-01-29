@@ -38,10 +38,23 @@ public class AcceptRunnable implements Runnable {
         while (true) {
             try {
                 Log.e("in acceptRunnable: ", "Before");
+
+                /*PublicStaticObjects.getMainActivity().runOnUiThread(
+                        () -> PublicStaticObjects.showToast("Accept, before"));*/
+
                 socket = serverSocket.accept();
+
+                /*String s = socket.getRemoteDevice().getName();
+                PublicStaticObjects.getMainActivity().runOnUiThread(
+                        () -> PublicStaticObjects.showToast("Accept, after " + s));*/
+
+                PublicStaticObjects.setIsConnected(true);
+
                 Log.e("in acceptRunnable: ", "After");
             } catch (IOException e) {
                 Log.e("in acceptRunnable: ", "Socket's accept() method failed", e);
+                /*PublicStaticObjects.getMainActivity().runOnUiThread(
+                        () -> PublicStaticObjects.showToast("AcceptRunnable: " + e.getMessage()));*/
                 e.printStackTrace();
                 break;
             }
@@ -77,7 +90,6 @@ public class AcceptRunnable implements Runnable {
         try {
             serverSocket.close();
             PublicStaticObjects.setIsConnected(false);
-//            PublicStaticObjects.showToast("close (AcceptRunnable)");
         } catch (IOException e) {
             Log.e("kek", "Could not close the connect socket", e);
         }

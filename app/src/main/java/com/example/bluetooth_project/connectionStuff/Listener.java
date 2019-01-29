@@ -24,6 +24,40 @@ public class Listener implements Runnable {
                     PublicStaticObjects.getMainActivity().runOnUiThread(() ->
                             PublicStaticObjects.getMainActivity().getEditText().setText(new String(buffer2).toCharArray(), 0, 6));
                 }
+                else if(buffer[0] == 0 && buffer[1] == 1 && buffer[2] == 2 && size == 3) {
+                    /*PublicStaticObjects.getMainActivity().runOnUiThread(() ->
+                            PublicStaticObjects.showToast("Listener, disconnecting"));*/
+
+                    if(InputAndOutput.getInputStream() != null) {
+                        try {
+                            InputAndOutput.getInputStream().close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        InputAndOutput.setInputStream(null);
+                    }
+
+                    if(InputAndOutput.getOutputStream() != null) {
+                        try {
+                            InputAndOutput.getOutputStream().close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        InputAndOutput.setOutputStream(null);
+                    }
+
+                    if(PublicStaticObjects.getSocket() != null) {
+                        try {
+                            PublicStaticObjects.getSocket().close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        PublicStaticObjects.setSocket(null);
+                    }
+
+                    //PublicStaticObjects.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
+                    // PublicStaticObjects.setMyUuid(PublicStaticObjects.getMyUuid() + "1");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

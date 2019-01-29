@@ -19,7 +19,6 @@ public class ConnectRunnable implements Runnable {
     private final UUID MY_UUID = UUID.fromString(PublicStaticObjects.getMyUuid());
 
     public ConnectRunnable(BluetoothDevice device) {
-
         // Use a temporary object that is later assigned to mmSocket
         // because mmSocket is final.
         BluetoothSocket tmp = null;
@@ -68,7 +67,11 @@ public class ConnectRunnable implements Runnable {
             // Connect to the remote device through the socket. This call blocks
             // until it succeeds or throws an exception.
             Log.e("in connectRunnable: ", "Before");
+
             socket.connect();
+
+            PublicStaticObjects.setIsConnected(true);
+
             Log.e("in connectRunnable: ", "After");
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
@@ -86,8 +89,6 @@ public class ConnectRunnable implements Runnable {
         try {
             socket.close();
             PublicStaticObjects.setIsConnected(false);
-            PublicStaticObjects.showToast("close (ConnectRunnable)");
-
         } catch (IOException e) {
             Log.e("lol", "Could not close the client socket", e);
         }

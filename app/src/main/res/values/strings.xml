@@ -3,6 +3,15 @@
     <string name="turn_on">Включить Bluetooth</string>
     <string name="discoverable">Сделать устройство\nвидимым</string>
     <string name="refresh">Обновить</string>
+    <string name="hint">Введите серийник</string>
     <string name="start_discovery">Начать поиск</string>
+    <string name="discovering">Поиск...</string>
+    <string name="bt_already">Bluetooth уже включен</string>
+    <string name="warn_bt">Bluetooth был выключен!</string>
+    <string name="u_have_to_bt">Вы должны включить Bluetooth</string>
+    <string name="wrong_sr">Серийник должен быть 6-значным</string>
+    <string name="deny_permission">Разрешение не получено!</string>
+    <string name="stop_process">Разъединение...</string>
+    <string name="stop">Разъединить</string>
     <string name="send">Отправить</string>
 </resources>
