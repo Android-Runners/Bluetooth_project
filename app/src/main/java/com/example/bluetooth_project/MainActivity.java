@@ -26,10 +26,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.bluetooth_project.ALL.InputAndOutput;
+import com.example.bluetooth_project.ALL.JsonConverter;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
 import com.example.bluetooth_project.connectionStuff.Listener;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -266,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void askToEnableBluetooth(BluetoothAdapter bluetoothAdapter) {
+    private void askToEnableBluetooth() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, REQUEST_ENABLE_BT);
     }
@@ -313,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void buttonTurnOnAction() {
         // checking if bluetooth is enabled
-        askToEnableBluetooth(bluetoothAdapter);
+        askToEnableBluetooth();
     }
 
     private void buttonSendAction() {
