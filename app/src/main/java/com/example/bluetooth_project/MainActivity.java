@@ -26,10 +26,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.bluetooth_project.ALL.InputAndOutput;
+import com.example.bluetooth_project.ALL.JsonConverter;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
 import com.example.bluetooth_project.connectionStuff.Listener;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -266,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void askToEnableBluetooth(BluetoothAdapter bluetoothAdapter) {
+    private void askToEnableBluetooth() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, REQUEST_ENABLE_BT);
     }
@@ -313,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void buttonTurnOnAction() {
         // checking if bluetooth is enabled
-        askToEnableBluetooth(bluetoothAdapter);
+        askToEnableBluetooth();
     }
 
     private void buttonSendAction() {
@@ -392,33 +394,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try {
-            if (requestCode == 228) {
-                if (resultCode == 300) {
-                    timer = new Timer();
-                    timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
-                } else {
-                    PublicStaticObjects.showToast(getResources().getString(R.string.deny_permission));
-                }
+        if (requestCode == 228) {
+            if (resultCode == 300) {
+                timer = new Timer();
+                timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
+            } else {
+                PublicStaticObjects.showToast(getResources().getString(R.string.deny_permission));
             }
-            if (requestCode == REQUEST_ENABLE_BT) {
-                // resultCode == -1 - OK
-                // resultCode ==  0 - NOT OK
-                if (resultCode == -1) {
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(() -> {
-                                runServer();
-                            });
-                        }
-                    }, 2000);
-                }
+        }
+        if (requestCode == REQUEST_ENABLE_BT) {
+            // resultCode == -1 - OK
+            // resultCode ==  0 - NOT OK
+            if (resultCode == -1) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(() -> runServer());
+                    } }, 2000);
             }
-        } catch(Throwable e) {
-            e.printStackTrace();
-            Log.e("LLLLOOOOLLLLL", e.getMessage());
         }
     }
 
