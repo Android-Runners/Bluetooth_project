@@ -394,33 +394,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try {
-            if (requestCode == 228) {
-                if (resultCode == 300) {
-                    timer = new Timer();
-                    timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
-                } else {
-                    PublicStaticObjects.showToast(getResources().getString(R.string.deny_permission));
-                }
+        if (requestCode == 228) {
+            if (resultCode == 300) {
+                timer = new Timer();
+                timer.scheduleAtFixedRate(newTimerTaskDecreaseCounter(), 0, 1000);
+            } else {
+                PublicStaticObjects.showToast(getResources().getString(R.string.deny_permission));
             }
-            if (requestCode == REQUEST_ENABLE_BT) {
-                // resultCode == -1 - OK
-                // resultCode ==  0 - NOT OK
-                if (resultCode == -1) {
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            runOnUiThread(() -> {
-                                runServer();
-                            });
-                        }
-                    }, 2000);
-                }
+        }
+        if (requestCode == REQUEST_ENABLE_BT) {
+            // resultCode == -1 - OK
+            // resultCode ==  0 - NOT OK
+            if (resultCode == -1) {
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(() -> runServer());
+                    } }, 2000);
             }
-        } catch(Throwable e) {
-            e.printStackTrace();
-            Log.e("LLLLOOOOLLLLL", e.getMessage());
         }
     }
 
