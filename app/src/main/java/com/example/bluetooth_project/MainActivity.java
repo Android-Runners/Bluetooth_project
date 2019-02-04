@@ -14,7 +14,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -25,15 +24,11 @@ import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.example.bluetooth_project.ALL.InputAndOutput;
-import com.example.bluetooth_project.ALL.JsonConverter;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
 import com.example.bluetooth_project.connectionStuff.Listener;
 import com.example.bluetooth_project.connectionStuff.clientPart.ConnectRunnable;
 import com.example.bluetooth_project.connectionStuff.serverPart.AcceptRunnable;
-import com.google.gson.Gson;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -91,18 +86,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // buttonTurnOn = findViewById(R.id.buttonTurnOn);
         buttonDiscovery = findViewById(R.id.buttonDiscovery);
         buttonDiscoverable = findViewById(R.id.buttonDiscoverable);
-        buttonSend = findViewById(R.id.buttonSend);
-        buttonStop = findViewById(R.id.buttonStop);
+        //buttonSend = findViewById(R.id.buttonSend);
+    //    buttonStop = findViewById(R.id.buttonStop);
         listView = findViewById(R.id.list);
-        editText = findViewById(R.id.editText);
-        scrollView = findViewById(R.id.scrollView);
+        //editText = findViewById(R.id.editText);
+    //    scrollView = findViewById(R.id.scrollView);
 
-        PublicStaticObjects.setEditText(editText);
+        //PublicStaticObjects.setEditText(editText);
 
         buttonDiscovery.setOnClickListener(this);
         buttonDiscoverable.setOnClickListener(this);
-        buttonSend.setOnClickListener(this);
-        buttonStop.setOnClickListener(this);
+        //buttonSend.setOnClickListener(this);
+    //    buttonStop.setOnClickListener(this);
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<>()) {
             @NonNull
             @Override
@@ -122,20 +117,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(receiver, filter);
 
-        buttonStop.setEnabled(false);
+    //    buttonStop.setEnabled(false);
 
         listView.setAdapter(arrayAdapter);
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> listViewAction(i) );
 
-        editText.setOnKeyListener((v, keyCode, event) -> {
+        /*editText.setOnKeyListener((v, keyCode, event) -> {
             // If the event is a key-down event on the "enter" button
             if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                     (keyCode == KeyEvent.KEYCODE_ENTER)) {
                 buttonSendAction();
             }
             return false;
-        });
+        });*/
 
         if(bluetoothAdapter.isEnabled()) {
             runServer();
@@ -207,20 +202,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Log.e("in MainActivity", "timer threw exception");
                 }
                 hideKeyboard();
-                editText.setVisibility(View.INVISIBLE);
-                editText.setText("");
+                /*editText.setVisibility(View.INVISIBLE);
+                editText.setText("");*/
 
-                buttonStop.setEnabled(false);
-                buttonStop.setText(R.string.stop);
+                /*buttonStop.setEnabled(false);
+                buttonStop.setText(R.string.stop);*/
                 setButtonsEnabled(true);
             }
             else if(BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                editText.setVisibility(View.VISIBLE);
-                editText.setText("");
+                /*editText.setVisibility(View.VISIBLE);
+                editText.setText("");*/
                 arrayAdapter.clear();
                 devices.clear();
 
-                buttonStop.setEnabled(true);
+                Intent sendingIntent = new Intent(PublicStaticObjects.getMainActivity(), SendingActivity.class);
+                startActivity(sendingIntent);
+
+                //buttonStop.setEnabled(true);
                 setButtonsEnabled(false);
             }
             else if(BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
@@ -230,11 +228,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     stopServer();
 
                     hideKeyboard();
-                    editText.setVisibility(View.INVISIBLE);
-                    editText.setText("");
+                    /*editText.setVisibility(View.INVISIBLE);
+                    editText.setText("");*/
 
-                    buttonStop.setEnabled(false);
-                    buttonStop.setText(R.string.stop);
+                    /*buttonStop.setEnabled(false);
+                    buttonStop.setText(R.string.stop);*/
                     setButtonsEnabled(true);
                 }
                 else if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_ON) {
@@ -318,8 +316,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         askToEnableBluetooth();
     }
 
-    private void buttonSendAction() {
-        if(InputAndOutput.getOutputStream() != null) {
+    private void buttonSendAction() { // Не вызывается
+       /* if(InputAndOutput.getOutputStream() != null) {
             String toSend = editText.getText().toString();
             if(editText.getText().toString().length() != 6) {
                 PublicStaticObjects.showToast(getResources().getString(R.string.wrong_sr));
@@ -338,23 +336,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
             }
-        }
-    }
-
-    private void buttonStopAction() {
-        if(InputAndOutput.getOutputStream() != null) {
-            buttonStop.setText(R.string.stop_process);
-            try {
-                byte[] buffer = new byte[3];
-//                buffer[0] = 0;
-                buffer[1] = 1;
-                buffer[2] = 2;
-                InputAndOutput.getOutputStream().write(buffer);
-                InputAndOutput.getOutputStream().flush();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        }
+        }*/
     }
 
     private void listViewAction(int i) {
@@ -364,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     // override methods:
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -382,12 +363,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.buttonDiscoverable:
                 buttonDiscoverableAction();
                 break;
-            case R.id.buttonSend:
+        /*    case R.id.buttonSend:
                 buttonSendAction();
-                break;
-            case R.id.buttonStop:
+                break;*/
+        /*    case R.id.buttonStop:
                 buttonStopAction();
-                break;
+                break;*/
         }
     }
 
@@ -418,9 +399,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // getters and setters:
 
-    public EditText getEditText() {
+    /*public EditText getEditText() {
         return editText;
-    }
+    }*/
 
     public Button getButtonSend() {
         return buttonSend;

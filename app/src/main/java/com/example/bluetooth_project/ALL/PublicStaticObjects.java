@@ -3,10 +3,14 @@ package com.example.bluetooth_project.ALL;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.bluetooth_project.MainActivity;
+import com.example.bluetooth_project.SendingActivity;
+
+import java.util.List;
 
 public class PublicStaticObjects {
 
@@ -21,7 +25,9 @@ public class PublicStaticObjects {
     }
 
     // variables:
+    private static List <CheckBox> checkBoxes;
     private static MainActivity mainActivity;
+    private static SendingActivity sendingActivity;
     private static BluetoothAdapter bluetoothAdapter;
     private static String MY_UUID = "f890841e-0131-4d6e-b1e6-656bd3a1d25d";
     private static Boolean isConnected = false;
@@ -86,6 +92,36 @@ public class PublicStaticObjects {
 
     public static void setMyUuid(String myUuid) {
         MY_UUID = myUuid;
+    }
+
+    public static List<CheckBox> getCheckBoxes() {
+        return checkBoxes;
+    }
+
+    public static void check(int i, boolean b) {
+        sendingActivity.runOnUiThread(() -> {
+            if(b) {
+                checkBoxes.get(i).setChecked(true);
+            } else {
+                checkBoxes.get(i).setChecked(false);
+            }
+        });
+    }
+
+    public static void closeSendingActivity() {
+        sendingActivity.runOnUiThread(() -> sendingActivity.finish());
+    }
+
+    public static void setCheckBoxes(List<CheckBox> checkBoxes) {
+        PublicStaticObjects.checkBoxes = checkBoxes;
+    }
+
+    public static SendingActivity getSendingActivity() {
+        return sendingActivity;
+    }
+
+    public static void setSendingActivity(SendingActivity sendingActivity) {
+        PublicStaticObjects.sendingActivity = sendingActivity;
     }
 
     private PublicStaticObjects() {}

@@ -14,4 +14,13 @@
     <string name="stop_process">Разъединение...</string>
     <string name="stop">Разъединить</string>
     <string name="send">Отправить</string>
+    <string name="title_activity_sending">Настройка режимов работы</string>
+    <string name="action_settings">Настройка</string>
+    <string name="day_pn">Пн</string>
+    <string name="day_vt">Вт</string>
+    <string name="day_sr">Ср</string>
+    <string name="day_cht">Чт</string>
+    <string name="day_pt">Пт</string>
+    <string name="day_sb">Сб</string>
+    <string name="day_vs">Вс</string>
 </resources>
