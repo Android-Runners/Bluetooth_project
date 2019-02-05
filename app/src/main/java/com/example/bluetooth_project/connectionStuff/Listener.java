@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Listener implements Runnable {
 
@@ -59,28 +60,25 @@ public class Listener implements Runnable {
                     }
                 } else {
 
-                    JSONArray bytesOff = json.getJSONArray("BytesOff");
                     JSONArray bytesOn = json.getJSONArray("BytesOn");
+                    JSONArray bytesOff = json.getJSONArray("BytesOff");
+                    JSONArray interval = json.getJSONArray("Interval");
+                    JSONArray proc = json.getJSONArray("Proc");
+                    JSONArray fan = json.getJSONArray("Fan");
+                    JSONArray nasos = json.getJSONArray("Nasos");
 
-                    byte[] recievedBytes = new byte[bytes.length()];
-                    byte[] recievedBytesOn = new byte[bytesOn.length()];
-                    byte[] recievedBytesOff = new byte[bytesOff.length()];
-                    for (int i = 0; i < bytes.length(); ++i) {
-                        recievedBytes[i] = (byte) bytes.getInt(i);
-                    }
-                    for (int i = 0; i < bytesOn.length(); ++i) {
-                        recievedBytesOn[i] = (byte) bytesOn.getInt(i);
-                    }
-                    for (int i = 0; i < bytesOff.length(); ++i) {
-                        recievedBytesOff[i] = (byte) bytesOff.getInt(i);
-                    }
+                    Log.e("LLOOOOLL", Arrays.toString(toByteArray(bytesOn)));
 
                     ObjectToSend objectRecieved = new ObjectToSend();
-                    objectRecieved.setBytes(recievedBytes);
-                    objectRecieved.setTimeOn(recievedBytesOn);
-                    objectRecieved.setTimeOff(recievedBytesOff);
+                    objectRecieved.setBytes(toByteArray(bytes));
+                    objectRecieved.setTimeOn(toByteArray(bytesOn));
+                    objectRecieved.setTimeOff(toByteArray(bytesOff));
+                    objectRecieved.setInterval(toByteArray(interval));
+                    objectRecieved.setProc(toByteArray(proc));
+                    objectRecieved.setFan(toByteArray(fan));
+                    objectRecieved.setNasos(toByteArray(nasos));
 
-                    buffer = recievedBytes;
+                    buffer = objectRecieved.getBytes();
 
                     // Recieved all data
                     if (objectRecieved.getTimeOn() != null && objectRecieved.getTimeOff() != null
@@ -94,6 +92,10 @@ public class Listener implements Runnable {
                                 PublicStaticObjects.check(i, false);
                             }
                         }
+                        PublicStaticObjects.setParam(new String(objectRecieved.getInterval()),
+                                new String(objectRecieved.getProc()),
+                                new String(objectRecieved.getFan()),
+                                new String(objectRecieved.getNasos()));
                     }
 
                 }
@@ -103,5 +105,17 @@ public class Listener implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    private byte[] toByteArray(JSONArray jsonArray) {
+        byte[] ans = new byte[jsonArray.length()];
+        try {
+            for (int i = 0; i < ans.length; ++i) {
+                ans[i] = (byte) jsonArray.getInt(i);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ans;
     }
 }

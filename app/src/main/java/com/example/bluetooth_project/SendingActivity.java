@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -29,6 +30,7 @@ public class SendingActivity extends AppCompatActivity {
     List<CheckBox> checkBoxes;
     LinearLayout timeOn, timeOff;
     TextView txtTimeOn, txtTimeOff;
+    EditText editInterval, editProc, editFan, editNasos;
 
     ObjectToSend myObject;
 
@@ -40,6 +42,11 @@ public class SendingActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         PublicStaticObjects.setSendingActivity(this);
+
+        editInterval = findViewById(R.id.editInterval);
+        editProc = findViewById(R.id.editProc);
+        editFan = findViewById(R.id.editFan);
+        editNasos = findViewById(R.id.editNasos);
 
         checkBoxes = new ArrayList<CheckBox>();
         checkBoxes.add(findViewById(R.id.rdbtPn));
@@ -59,6 +66,10 @@ public class SendingActivity extends AppCompatActivity {
         PublicStaticObjects.setCheckBoxes(checkBoxes);
         PublicStaticObjects.setTxtTimeOn(txtTimeOn);
         PublicStaticObjects.setTxtTimeOff(txtTimeOff);
+        PublicStaticObjects.setEditFan(editFan);
+        PublicStaticObjects.setEditInterval(editInterval);
+        PublicStaticObjects.setEditNasos(editNasos);
+        PublicStaticObjects.setEditProc(editProc);
 
         myObject = new ObjectToSend();
 
@@ -68,6 +79,19 @@ public class SendingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(InputAndOutput.getOutputStream() != null) {
                     try {
+                        if(editInterval.getText().toString().isEmpty()) {
+                            editInterval.setText(R.string.begin_interval);
+                        }
+                        if(editFan.getText().toString().isEmpty()) {
+                            editFan.setText(R.string.begin_ventilator);
+                        }
+                        if(editNasos.getText().toString().isEmpty()) {
+                            editNasos.setText(R.string.begin_nasos);
+                        }
+                        if(editProc.getText().toString().isEmpty()) {
+                            editProc.setText(R.string.begin_procrab);
+                        }
+
                         byte[] toSend = new byte[7];
                         for (int i = 0; i < 7; i++) {
                             toSend[i] = 0;
@@ -78,12 +102,24 @@ public class SendingActivity extends AppCompatActivity {
                         myObject.setBytes(toSend);
                         myObject.setTimeOn((txtTimeOn.getText() + "").getBytes());
                         myObject.setTimeOff((txtTimeOff.getText() + "").getBytes());
+                        myObject.setInterval((editInterval.getText() + "").getBytes());
+                        myObject.setNasos((editNasos.getText() + "").getBytes());
+                        myObject.setProc((editProc.getText() + "").getBytes());
+                        myObject.setFan((editFan.getText() + "").getBytes());
                         sendData(myObject);
 
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
                 }
+            }
+        });
+
+        FloatingActionButton fabDate = findViewById(R.id.fabDate);
+        fabDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
@@ -139,9 +175,18 @@ public class SendingActivity extends AppCompatActivity {
             JSONArray jsBytes = new JSONArray(myObject.getBytes());
             JSONArray jsBytesOn = new JSONArray(myObject.getTimeOn());
             JSONArray jsBytesOff = new JSONArray(myObject.getTimeOff());
+            JSONArray jsInterval = new JSONArray(myObject.getInterval());
+            JSONArray jsProc = new JSONArray(myObject.getProc());
+            JSONArray jsFan = new JSONArray(myObject.getFan());
+            JSONArray jsNasos = new JSONArray(myObject.getNasos());
+
             jsSend.put("Bytes", jsBytes);
             jsSend.put("BytesOn", jsBytesOn);
             jsSend.put("BytesOff", jsBytesOff);
+            jsSend.put("Interval", jsInterval);
+            jsSend.put("Proc", jsProc);
+            jsSend.put("Fan", jsFan);
+            jsSend.put("Nasos", jsNasos);
             InputAndOutput.getOutputStream().write(jsSend.toString().getBytes());
             InputAndOutput.getOutputStream().flush();
         } catch (Exception e) {
@@ -200,5 +245,4 @@ public class SendingActivity extends AppCompatActivity {
         buttonStopAction();
         PublicStaticObjects.setSendingActivity(null);
     }
-
 }

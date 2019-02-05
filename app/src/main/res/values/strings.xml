@@ -25,4 +25,12 @@
     <string name="day_vs">Вс</string>
     <string name="time_on">Время вкл\n00:00</string>
     <string name="time_off">Время выкл\n00:00</string>
+    <string name="interval">Интервал</string>
+    <string name="begin_interval">90</string>
+    <string name="procrab">Процент раб</string>
+    <string name="begin_procrab">5</string>
+    <string name="ventilator">Вентилятор</string>
+    <string name="begin_ventilator">155</string>
+    <string name="nasos">Насос</string>
+    <string name="begin_nasos">200</string>
 </resources>

@@ -3,6 +3,7 @@ package com.example.bluetooth_project.ALL;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ public class PublicStaticObjects {
     }
 
     // variables:
+    private static EditText editInterval, editProc, editFan, editNasos;
     private static TextView txtTimeOn, txtTimeOff;
     private static List <CheckBox> checkBoxes;
     private static MainActivity mainActivity;
@@ -132,6 +134,43 @@ public class PublicStaticObjects {
 
     public static void setTxtTimeOff(TextView txtTimeOff) {
         PublicStaticObjects.txtTimeOff = txtTimeOff;
+    }
+
+    public static void setParam(String inter, String proc, String fan, String nasos) {
+        sendingActivity.runOnUiThread(() -> {
+            if(inter != null && !inter.isEmpty()) {
+                editInterval.setText(inter);
+            }
+
+            if(proc != null && !proc.isEmpty()) {
+                editProc.setText(proc);
+            }
+
+            if(fan != null && !fan.isEmpty()) {
+                editFan.setText(fan);
+            }
+
+            if(nasos != null && !nasos.isEmpty()) {
+                editNasos.setText(nasos);
+            }
+
+        });
+    }
+
+    public static void setEditInterval(EditText editInterval) {
+        PublicStaticObjects.editInterval = editInterval;
+    }
+
+    public static void setEditProc(EditText editProc) {
+        PublicStaticObjects.editProc = editProc;
+    }
+
+    public static void setEditFan(EditText editFan) {
+        PublicStaticObjects.editFan = editFan;
+    }
+
+    public static void setEditNasos(EditText editNasos) {
+        PublicStaticObjects.editNasos = editNasos;
     }
 
     private PublicStaticObjects() {}
