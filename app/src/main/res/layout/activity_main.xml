@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.bluetooth_project.MainActivity"
+    tools:ignore="NestedWeights"
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
     android:orientation="vertical"

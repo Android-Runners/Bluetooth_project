@@ -23,4 +23,6 @@
     <string name="day_pt">Пт</string>
     <string name="day_sb">Сб</string>
     <string name="day_vs">Вс</string>
+    <string name="time_on">Время вкл\n00:00</string>
+    <string name="time_off">Время выкл\n00:00</string>
 </resources>

@@ -6,14 +6,19 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".SendingActivity"
+    tools:ignore="NestedWeights"
+    android:weightSum="1"
+    android:orientation="vertical"
     tools:showIn="@layout/activity_sending">
         <LinearLayout
             android:layout_width="fill_parent"
             android:gravity="center"
+            android:layout_weight="0.05"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="1"
             android:baselineAligned="false">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -260,5 +265,77 @@
             </LinearLayout>
 
         </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:weightSum="1"
+        android:layout_weight="0.95"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="0dp"
+            android:layout_weight="0.5">
+
+            <LinearLayout
+                android:id="@+id/timeOn"
+                android:background="@android:color/holo_green_dark"
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.49">
+
+                <TextView
+                    android:id="@+id/textTimeOn"
+                    android:textColor="@android:color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textStyle="bold"
+                    android:textSize="10pt"
+                    android:text="@string/time_on"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.02" />
+
+            <LinearLayout
+                android:id="@+id/timeOff"
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:background="@android:color/holo_green_dark"
+                android:weightSum="1"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.49">
+
+                <TextView
+                    android:id="@+id/textTimeOff"
+                    android:textColor="@android:color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:textSize="10pt"
+                    android:text="@string/time_off"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="0.4"></LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

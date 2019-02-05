@@ -1,7 +1,13 @@
 package com.example.bluetooth_project.connectionStuff;
 
+import android.util.Log;
+
 import com.example.bluetooth_project.ALL.InputAndOutput;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
+import com.example.bluetooth_project.ObjectToSend;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -15,16 +21,13 @@ public class Listener implements Runnable {
                 continue;
             }
             try {
-                // size must be 6 + 3, but who knows
-                byte[] buffer = new byte[6 + 3];
-                int size = InputAndOutput.getInputStream().read(buffer);
-                if(size == 6 + 3 && buffer[0] == 2 && buffer[1] == 2 && buffer[2] == 8) {
-                    byte[] buffer2 = new byte[6];
-                    System.arraycopy(buffer, 3, buffer2, 0, 6);
-                   /* PublicStaticObjects.getMainActivity().runOnUiThread(() ->
-                            PublicStaticObjects.getMainActivity().getEditText().setText(new String(buffer2).toCharArray(), 0, 6));*/
-                }
-                else if(size == 3 && buffer[0] == 0 && buffer[1] == 1 && buffer[2] == 2) {
+                byte[] buffer = new byte[512000];
+                InputAndOutput.getInputStream().read(buffer);
+
+                JSONObject json = new JSONObject(new String(buffer));
+                JSONArray bytes = json.getJSONArray("Bytes");
+
+                if(bytes.length() == 3) {// Stop connection
                     if(InputAndOutput.getInputStream() != null) {
                         try {
                             InputAndOutput.getInputStream().close();
@@ -54,17 +57,49 @@ public class Listener implements Runnable {
                     if(PublicStaticObjects.getSendingActivity() != null) {
                         PublicStaticObjects.closeSendingActivity();
                     }
-                }
-                else if(size == 7 && PublicStaticObjects.getCheckBoxes() != null && !PublicStaticObjects.getCheckBoxes().isEmpty()) {
-                    for(int i = 0; i < 7; i++) {
-                        if(buffer[i] == 1) {
-                            PublicStaticObjects.check(i, true);
-                        } else {
-                            PublicStaticObjects.check(i, false);
+                } else {
+
+                    JSONArray bytesOff = json.getJSONArray("BytesOff");
+                    JSONArray bytesOn = json.getJSONArray("BytesOn");
+
+                    byte[] recievedBytes = new byte[bytes.length()];
+                    byte[] recievedBytesOn = new byte[bytesOn.length()];
+                    byte[] recievedBytesOff = new byte[bytesOff.length()];
+                    for (int i = 0; i < bytes.length(); ++i) {
+                        recievedBytes[i] = (byte) bytes.getInt(i);
+                    }
+                    for (int i = 0; i < bytesOn.length(); ++i) {
+                        recievedBytesOn[i] = (byte) bytesOn.getInt(i);
+                    }
+                    for (int i = 0; i < bytesOff.length(); ++i) {
+                        recievedBytesOff[i] = (byte) bytesOff.getInt(i);
+                    }
+
+                    ObjectToSend objectRecieved = new ObjectToSend();
+                    objectRecieved.setBytes(recievedBytes);
+                    objectRecieved.setTimeOn(recievedBytesOn);
+                    objectRecieved.setTimeOff(recievedBytesOff);
+
+                    buffer = recievedBytes;
+
+                    // Recieved all data
+                    if (objectRecieved.getTimeOn() != null && objectRecieved.getTimeOff() != null
+                            && buffer.length == 7 && PublicStaticObjects.getCheckBoxes() != null
+                            && !PublicStaticObjects.getCheckBoxes().isEmpty()) {
+                        PublicStaticObjects.setTime(new String(objectRecieved.getTimeOn()), new String(objectRecieved.getTimeOff()));
+                        for (int i = 0; i < 7; i++) {
+                            if (buffer[i] == 1) {
+                                PublicStaticObjects.check(i, true);
+                            } else {
+                                PublicStaticObjects.check(i, false);
+                            }
                         }
                     }
+
                 }
-            } catch (IOException e) {
+
+            } catch (Exception e) {
+                Log.e("!!!!", e.getMessage());
                 e.printStackTrace();
             }
         }

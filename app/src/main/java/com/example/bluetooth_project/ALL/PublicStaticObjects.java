@@ -2,9 +2,8 @@ package com.example.bluetooth_project.ALL;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothSocket;
-import android.view.View;
 import android.widget.CheckBox;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.bluetooth_project.MainActivity;
@@ -25,13 +24,13 @@ public class PublicStaticObjects {
     }
 
     // variables:
+    private static TextView txtTimeOn, txtTimeOff;
     private static List <CheckBox> checkBoxes;
     private static MainActivity mainActivity;
     private static SendingActivity sendingActivity;
     private static BluetoothAdapter bluetoothAdapter;
     private static String MY_UUID = "f890841e-0131-4d6e-b1e6-656bd3a1d25d";
     private static Boolean isConnected = false;
-    private static EditText ediText;
     private static BluetoothSocket socket;
 
     // getters and setters:
@@ -61,18 +60,6 @@ public class PublicStaticObjects {
 
     public static void setIsConnected(Boolean isConnected) {
         PublicStaticObjects.isConnected = isConnected;
-    }
-
-    public static EditText getEdiText() {
-        return ediText;
-    }
-
-    public static void setEditText(EditText ediText) {
-        PublicStaticObjects.ediText = ediText;
-    }
-
-    public static void setVisible() {
-        ediText.setVisibility(View.VISIBLE);
     }
 
     public static void stopBluetoothAdapter() {
@@ -108,6 +95,13 @@ public class PublicStaticObjects {
         });
     }
 
+    public static void setTime(String on, String off) {
+        sendingActivity.runOnUiThread(() -> {
+            txtTimeOn.setText(on);
+            txtTimeOff.setText(off);
+        });
+    }
+
     public static void closeSendingActivity() {
         sendingActivity.runOnUiThread(() -> sendingActivity.finish());
     }
@@ -122,6 +116,22 @@ public class PublicStaticObjects {
 
     public static void setSendingActivity(SendingActivity sendingActivity) {
         PublicStaticObjects.sendingActivity = sendingActivity;
+    }
+
+    public static TextView getTxtTimeOn() {
+        return txtTimeOn;
+    }
+
+    public static void setTxtTimeOn(TextView txtTimeOn) {
+        PublicStaticObjects.txtTimeOn = txtTimeOn;
+    }
+
+    public static TextView getTxtTimeOff() {
+        return txtTimeOff;
+    }
+
+    public static void setTxtTimeOff(TextView txtTimeOff) {
+        PublicStaticObjects.txtTimeOff = txtTimeOff;
     }
 
     private PublicStaticObjects() {}
