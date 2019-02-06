@@ -122,9 +122,7 @@ public class SendingActivity extends AppCompatActivity {
             @SuppressLint("SimpleDateFormat")
             @Override
             public void onClick(View view) {
-                //   DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
-                //   String date = df.format(Calendar.getInstance().getTime());
-                DateFormat df = new SimpleDateFormat("h:mm a");
+                DateFormat df = new SimpleDateFormat("hh:mm:ss a");
                 String time = df.format(Calendar.getInstance().getTime());
                 df = new SimpleDateFormat("EEEE");
                 String day = df.format(Calendar.getInstance().getTime());
@@ -149,7 +147,6 @@ public class SendingActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         });
 
