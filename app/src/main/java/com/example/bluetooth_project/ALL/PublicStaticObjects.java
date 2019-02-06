@@ -26,6 +26,9 @@ public class PublicStaticObjects {
 
     // variables:
     private static EditText editInterval, editProc, editFan, editNasos;
+
+
+    private static TextView txtDateTime;
     private static TextView txtTimeOn, txtTimeOff;
     private static List <CheckBox> checkBoxes;
     private static MainActivity mainActivity;
@@ -128,6 +131,16 @@ public class PublicStaticObjects {
         PublicStaticObjects.txtTimeOn = txtTimeOn;
     }
 
+    public static void setTimeDate (String state, String time, String day, String date) {
+        sendingActivity.runOnUiThread(() -> {
+            String s = "Состояние: " + state + "\n\n"
+                    + "Время: " + time + "\n\n"
+                    + "День: " + day + "\n\n"
+                    + "Дата: " + date + "\n\n";
+            txtDateTime.setText(s);
+        });
+    }
+
     public static TextView getTxtTimeOff() {
         return txtTimeOff;
     }
@@ -171,6 +184,14 @@ public class PublicStaticObjects {
 
     public static void setEditNasos(EditText editNasos) {
         PublicStaticObjects.editNasos = editNasos;
+    }
+
+    public static TextView getTxtDateTime() {
+        return txtDateTime;
+    }
+
+    public static void setTxtDateTime(TextView txtDateTime) {
+        PublicStaticObjects.txtDateTime = txtDateTime;
     }
 
     private PublicStaticObjects() {}

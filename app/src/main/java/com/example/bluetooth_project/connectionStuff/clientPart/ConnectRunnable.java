@@ -68,21 +68,20 @@ public class ConnectRunnable implements Runnable {
 
     private boolean connectDevices() {
         try {
-            // Connect to the remote device through the socket. This call blocks
-            // until it succeeds or throws an exception.
-            Log.e("in connectRunnable: ", "Before");
+
+            PublicStaticObjects.getMainActivity().runOnUiThread(() ->
+                    PublicStaticObjects.showToast("Ожидайте соединения...")
+            );
 
             socket.connect();
 
             PublicStaticObjects.setIsConnected(true);
-
-            Log.e("in connectRunnable: ", "After " + (socket.getRemoteDevice().getName()));
         } catch (IOException connectException) {
             // Unable to connect; close the socket and return.
             try {
                 socket.close();
             } catch (IOException closeException) {
-                Log.e("in connectRunnable: ", "Could not close the client socket", closeException);
+                closeException.printStackTrace();
             }
             return false;
         }

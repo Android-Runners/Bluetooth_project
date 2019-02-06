@@ -14,13 +14,13 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.bluetooth_project.ALL.InputAndOutput;
-import com.example.bluetooth_project.ALL.JsonConverter;
 import com.example.bluetooth_project.ALL.PublicStaticObjects;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -29,7 +29,7 @@ public class SendingActivity extends AppCompatActivity {
 
     List<CheckBox> checkBoxes;
     LinearLayout timeOn, timeOff;
-    TextView txtTimeOn, txtTimeOff;
+    TextView txtTimeOn, txtTimeOff, txtDateTime;
     EditText editInterval, editProc, editFan, editNasos;
 
     ObjectToSend myObject;
@@ -62,6 +62,7 @@ public class SendingActivity extends AppCompatActivity {
         timeOff = findViewById(R.id.timeOff);
         txtTimeOn = findViewById(R.id.textTimeOn);
         txtTimeOff = findViewById(R.id.textTimeOff);
+        txtDateTime = findViewById(R.id.txtDateTime);
 
         PublicStaticObjects.setCheckBoxes(checkBoxes);
         PublicStaticObjects.setTxtTimeOn(txtTimeOn);
@@ -70,6 +71,7 @@ public class SendingActivity extends AppCompatActivity {
         PublicStaticObjects.setEditInterval(editInterval);
         PublicStaticObjects.setEditNasos(editNasos);
         PublicStaticObjects.setEditProc(editProc);
+        PublicStaticObjects.setTxtDateTime(txtDateTime);
 
         myObject = new ObjectToSend();
 
@@ -117,8 +119,36 @@ public class SendingActivity extends AppCompatActivity {
 
         FloatingActionButton fabDate = findViewById(R.id.fabDate);
         fabDate.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SimpleDateFormat")
             @Override
             public void onClick(View view) {
+                //   DateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss");
+                //   String date = df.format(Calendar.getInstance().getTime());
+                DateFormat df = new SimpleDateFormat("h:mm a");
+                String time = df.format(Calendar.getInstance().getTime());
+                df = new SimpleDateFormat("EEEE");
+                String day = df.format(Calendar.getInstance().getTime());
+                df = new SimpleDateFormat("yyyy.MM.dd");
+                String date = df.format(Calendar.getInstance().getTime());
+                try {
+                    JSONObject jsSend = new JSONObject();
+                    JSONArray dateTime = new JSONArray(time.getBytes());
+                    JSONArray dateDay = new JSONArray(day.getBytes());
+                    JSONArray dateDate = new JSONArray(date.getBytes());
+                    jsSend.put("time", dateTime);
+                    jsSend.put("day", dateDay);
+                    jsSend.put("date", dateDate);
+                    InputAndOutput.getOutputStream().flush();
+                    InputAndOutput.getOutputStream().write(jsSend.toString().getBytes());
+                    InputAndOutput.getOutputStream().flush();
+                    PublicStaticObjects.setTimeDate(
+                            "отправлено",
+                            new String(time.getBytes()),
+                            new String(day.getBytes()),
+                            new String(date.getBytes()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -169,8 +199,6 @@ public class SendingActivity extends AppCompatActivity {
 
     private void sendData(ObjectToSend myObject) {
         try {
-            InputAndOutput.getOutputStream().flush();
-
             JSONObject jsSend = new JSONObject();
             JSONArray jsBytes = new JSONArray(myObject.getBytes());
             JSONArray jsBytesOn = new JSONArray(myObject.getTimeOn());
@@ -187,6 +215,7 @@ public class SendingActivity extends AppCompatActivity {
             jsSend.put("Proc", jsProc);
             jsSend.put("Fan", jsFan);
             jsSend.put("Nasos", jsNasos);
+            InputAndOutput.getOutputStream().flush();
             InputAndOutput.getOutputStream().write(jsSend.toString().getBytes());
             InputAndOutput.getOutputStream().flush();
         } catch (Exception e) {
@@ -225,24 +254,32 @@ public class SendingActivity extends AppCompatActivity {
     }
 
     private void buttonStopAction() {
-        if(InputAndOutput.getOutputStream() != null) {
-            try {
-                byte[] buffer = new byte[3];
-                buffer[1] = 1;
-                buffer[2] = 2;
-                ObjectToSend objectStop = new ObjectToSend(buffer);
-                InputAndOutput.getOutputStream().write(JsonConverter.toJson(objectStop).getBytes());
-                InputAndOutput.getOutputStream().flush();
-            } catch(IOException e) {
-                e.printStackTrace();
+        PublicStaticObjects.getMainActivity().runOnUiThread(() -> {
+            if(InputAndOutput.getOutputStream() != null) {
+                try {
+                    byte[] buffer = new byte[3];
+                    buffer[1] = 1;
+                    buffer[2] = 2;
+                    JSONObject toSendStop = new JSONObject();
+                    JSONArray stopBuffer = new JSONArray(buffer);
+                    toSendStop.put("STOP", stopBuffer);
+                    InputAndOutput.getOutputStream().write(toSendStop.toString().getBytes());
+                    InputAndOutput.getOutputStream().flush();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        });
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         buttonStopAction();
+        PublicStaticObjects.showToast("Ожидайте рассоединения...");
+        PublicStaticObjects.setIsConnected(false);
         PublicStaticObjects.setSendingActivity(null);
     }
+
 }

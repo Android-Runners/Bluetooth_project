@@ -287,6 +287,11 @@
             android:layout_weight="0.13">
 
             <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.02" />
+
+            <LinearLayout
                 android:id="@+id/timeOn"
                 android:background="@android:color/holo_green_dark"
                 android:layout_width="0dp"
@@ -294,7 +299,7 @@
                 android:weightSum="1"
                 android:gravity="center"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.49">
+                android:layout_weight="0.47">
 
                 <TextView
                     android:id="@+id/textTimeOn"
@@ -321,7 +326,7 @@
                 android:weightSum="1"
                 android:gravity="center"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.49">
+                android:layout_weight="0.47">
 
                 <TextView
                     android:id="@+id/textTimeOff"
@@ -334,6 +339,11 @@
                     android:text="@string/time_off"/>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.02" />
 
         </LinearLayout>
 
@@ -510,6 +520,52 @@
 
         </LinearLayout>
 
+        <!-- Полоса -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.03"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.35"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.3"
+                android:background="@android:color/darker_gray"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.35"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.52"
+
+            android:orientation="horizontal"
+            android:weightSum="1">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.02"/>
+            <TextView
+                android:id="@+id/txtDateTime"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:textStyle="bold"
+                android:layout_weight="0.98"
+                android:text="@string/textTime"
+                android:textSize="12pt"/>
+        </LinearLayout>
 
     </LinearLayout>
 

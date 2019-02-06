@@ -33,4 +33,5 @@
     <string name="begin_ventilator">155</string>
     <string name="nasos">Насос</string>
     <string name="begin_nasos">200</string>
+    <string name="textTime">Состояние:\n\nВремя:\n\nДень:\n\nДата:\n\n</string>
 </resources>
